@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vitrine d’exemple</title>
+
+  <style>
+    /* ====== Design tokens ====== */
+    :root{
+      --bg: #0f1223;           /* Fond principal (sombre élégant) */
+      --panel: #171a2b;        /* Panneaux/cartes */
+      --text: #eaeaf2;         /* Texte principal */
+      --muted: #b7b9c9;        /* Texte secondaire */
+      --accent: #7c5cff;       /* Couleur d’accent */
+      --accent-2: #4dd0e1;     /* Accent secondaire */
+      --ring: rgba(124,92,255,.45);
+      --shadow: rgba(0,0,0,.25);
+      --radius: 16px;
+      --gap: 24px;
+      --sidebar-w: 280px;
+      --speed: 240ms;
+    }
+
+    @media (prefers-color-scheme: light){
+      :root{
+        --bg: #f7f7fb;
+        --panel: #ffffff;
+        --text: #1f2233;
+        --muted: #5a6078;
+        --accent: #4c7cf3;
+        --accent-2: #7c5cff;
+        --ring: rgba(76,124,243,.35);
+        --shadow: rgba(16, 24, 40, .08);
+      }
+    }
+
+    /* ====== Reset + base ====== */
+    *,*::before,*::after{ box-sizing: border-box; }
+    html{ scroll-behavior: smooth; }
+    body{
+      margin: 0;
+      font: 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, "Helvetica Neue", Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color: var(--text);
+      background: radial-gradient(1200px 800px at 70% -10%, rgba(124,92,255,.08), transparent 40%), var(--bg);
+    }
+    img{ max-width: 100%; height: auto; display: block; border-radius: calc(var(--radius) - 4px); }
+    a{ color: inherit; text-decoration: none; }
+
+    /* ====== Layout ====== */
+    .layout{
+      display: grid;
+      grid-template-columns: var(--sidebar-w) 1fr;
+      min-height: 100dvh;
+    }
+    aside{
+      position: sticky; top: 0;
+      height: 100dvh;
+      padding: 28px 22px;
+      border-right: 1px solid rgba(255,255,255,.06);
+      background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0) 40%), transparent;
+      display: flex; flex-direction: column; gap: 24px;
+    }
+    .brand{
+      display: flex; align-items: center; gap: 12px;
+      font-weight: 700; letter-spacing: .3px;
+    }
+    .badge{
+      width: 14px; height: 14px; border-radius: 4px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow: 0 0 0 4px rgba(124,92,255,.15);
+    }
+    nav ul{ list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+    .nav-link{
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px; border-radius: 12px; color: var(--muted);
+      transition: background var(--speed), color var(--speed), transform var(--speed);
+      outline: none;
+    }
+    .dot{ width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: .5; }
+    .nav-link:hover{ background: rgba(255,255,255,.05); color: var(--text); transform: translateX(2px); }
+    .nav-link:focus-visible{ box-shadow: 0 0 0 3px var(--ring); }
+    .nav-link.active{
+      background: rgba(124,92,255,.12);
+      color: var(--text);
+      box-shadow: inset 0 0 0 1px rgba(124,92,255,.35);
+    }
+
+    .sidebar-foot{
+      margin-top: auto;
+      color: var(--muted);
+      font-size: 12px;
+      opacity: .8;
+    }
+
+    main{
+      padding: 40px clamp(20px, 4vw, 64px);
+    }
+    section{
+      margin: 0 auto 64px;
+      max-width: 1100px;
+      background: color-mix(in oklab, var(--panel) 92%, transparent);
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: var(--radius);
+      box-shadow: 0 20px 50px var(--shadow);
+      padding: clamp(18px, 4vw, 40px);
+      opacity: 0; transform: translateY(18px); /* reveal default state */
+      will-change: opacity, transform;
+    }
+    section.revealed{ opacity: 1; transform: translateY(0); transition: opacity var(--speed) ease, transform var(--speed) ease; }
+    @media (prefers-reduced-motion: reduce){
+      html{ scroll-behavior: auto; }
+      .nav-link{ transition: none; }
+      section{ opacity: 1; transform: none; }
+    }
+
+    /* ====== Typo ====== */
+    h1,h2{ margin: 0 0 8px; line-height: 1.15; letter-spacing: .2px; }
+    .eyebrow{
+      font-size: 12px; text-transform: uppercase; letter-spacing: .18em;
+      color: var(--muted); margin-bottom: 8px;
+    }
+    .lead{ color: var(--muted); margin: 8px 0 0; }
+
+    /* ====== Components ====== */
+    .hero{
+      display: grid; gap: var(--gap);
+      grid-template-columns: 1.2fr .8fr;
+      align-items: center;
+    }
+    .card-grid{
+      display: grid; gap: var(--gap);
+      grid-template-columns: repeat(12, 1fr);
+    }
+    .card{
+      grid-column: span 4;
+      background: var(--panel);
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: var(--radius);
+      padding: 16px;
+      transition: transform var(--speed), box-shadow var(--speed), border-color var(--speed);
+    }
+    .card:hover{
+      transform: translateY(-4px);
+      box-shadow: 0 12px 30px var(--shadow);
+      border-color: rgba(124,92,255,.35);
+    }
+    @media (max-width: 1000px){
+      .hero{ grid-template-columns: 1fr; }
+      .card{ grid-column: span 6; }
+    }
+    @media (max-width: 640px){
+      .card{ grid-column: span 12; }
+    }
+
+    .btn{
+      display: inline-flex; align-items: center; justify-content: center;
+      padding: 10px 14px; gap: 8px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: white; font-weight: 600; border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(124,92,255,.35);
+      border: none; cursor: pointer;
+      transition: transform var(--speed), box-shadow var(--speed), opacity var(--speed);
+    }
+    .btn:hover{ transform: translateY(-2px); box-shadow: 0 10px 24px rgba(124,92,255,.45); }
+    .btn:focus-visible{ outline: 3px solid var(--ring); outline-offset: 2px; }
+    .btn.ghost{
+      background: transparent; color: var(--text);
+      box-shadow: none; border: 1px solid rgba(255,255,255,.18);
+    }
+    .btn.ghost:hover{ border-color: rgba(124,92,255,.45); }
+
+    .kicker{
+      display: inline-flex; align-items: center; gap: 10px;
+      color: var(--muted); margin-bottom: 14px;
+    }
+    .k-dot{ width: 8px; height: 8px; border-radius: 4px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); }
+
+    .meta{
+      display: flex; gap: 12px; flex-wrap: wrap; color: var(--muted); font-size: 14px;
+    }
+    .field{
+      display: grid; gap: 6px; margin-bottom: 12px;
+    }
+    input, textarea{
+      background: var(--panel);
+      color: var(--text);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 12px;
+      padding: 12px 14px;
+      outline: none;
+      transition: border-color var(--speed), box-shadow var(--speed);
+    }
+    input::placeholder, textarea::placeholder{ color: var(--muted); }
+    input:focus, textarea:focus{
+      border-color: rgba(124,92,255,.45);
+      box-shadow: 0 0 0 3px var(--ring);
+    }
+
+    /* ====== Helpers ====== */
+    .spacer{ height: 6px; }
+    .hr{
+      height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,.12), transparent);
+      margin: 14px 0 10px;
+    }
+    .tag{
+      display:inline-block; padding: 6px 10px; border-radius: 999px;
+      border:1px solid rgba(255,255,255,.12); color: var(--muted); font-size: 12px;
+    }
+
+    /* ====== Scroll padding so titles aren’t cachés sous le bord ====== */
+    :target{ scroll-margin-top: 24px; }
+
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <!-- ===== Sidebar ===== -->
+    <aside aria-label="Menu latéral">
+      <div class="brand" aria-label="Identité du site">
+        <span class="badge" aria-hidden="true"></span>
+        <span>Vitrine d’exemple</span>
+      </div>
+
+      <nav aria-label="Navigation principale">
+        <ul>
+          <li><a class="nav-link" href="#accueil"><span class="dot" aria-hidden="true"></span> Accueil</a></li>
+          <li><a class="nav-link" href="#section-1"><span class="dot" aria-hidden="true"></span> Section 1</a></li>
+          <li><a class="nav-link" href="#section-2"><span class="dot" aria-hidden="true"></span> Section 2</a></li>
+          <li><a class="nav-link" href="#section-3"><span class="dot" aria-hidden="true"></span> Section 3</a></li>
+          <li><a class="nav-link" href="#contact"><span class="dot" aria-hidden="true"></span> Contact</a></li>
+        </ul>
+      </nav>
+
+      <div class="sidebar-foot">Exemple de maquette — pas de contenu commercial.</div>
+    </aside>
+
+    <!-- ===== Main ===== -->
+    <main id="content">
+      <!-- Accueil -->
+      <section id="accueil" aria-labelledby="h-accueil">
+        <div class="kicker"><span class="k-dot" aria-hidden="true"></span><span>Accueil</span></div>
+        <h1 id="h-accueil">Titre — Vitrine d’exemple</h1>
+        <p class="lead">Sous-titre — Texte de présentation concis, neutre et générique. Ce bloc montre la structure, la hiérarchie et l’espace.</p>
+        <div class="spacer"></div>
+        <div class="hero">
+          <div>
+            <div class="hr"></div>
+            <p><strong>Texte :</strong> Ceci est un texte d’exemple (paragraphe). Utilisez ce gabarit pour présenter une idée, une image, un bouton d’action neutre.</p>
+            <div class="meta">
+              <span class="tag">Élément: Titre</span>
+              <span class="tag">Élément: Sous-titre</span>
+              <span class="tag">Élément: Texte</span>
+              <span class="tag">Élément: Bouton</span>
+              <span class="tag">Élément: Image</span>
+            </div>
+            <div class="spacer"></div>
+            <div style="display:flex; gap:12px; flex-wrap:wrap;">
+              <a class="btn" href="#section-1" role="button">Voir Section 1</a>
+              <a class="btn ghost" href="#section-2" role="button">Aller Section 2</a>
+            </div>
+          </div>
+          <div>
+            <img src="https://picsum.photos/800/520?random=1" alt="Image exemple (remplaçable)">
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 1 -->
+      <section id="section-1" aria-labelledby="h-s1">
+        <div class="kicker"><span class="k-dot" aria-hidden="true"></span><span>Section 1</span></div>
+        <h2 id="h-s1">Titre de section</h2>
+        <p class="lead">Sous-titre — bref descriptif. Zone pour cartes “Image + Titre + Texte + Bouton”.</p>
+        <div class="card-grid" style="margin-top:16px;">
+          <article class="card" aria-labelledby="s1c1">
+            <img src="https://picsum.photos/640/400?random=2" alt="Image exemple 1">
+            <div class="hr"></div>
+            <h3 id="s1c1">Titre d’élément</h3>
+            <p>Texte exemple — description courte et générique d’un bloc de contenu.</p>
+            <a class="btn ghost" href="#section-1">Bouton</a>
+          </article>
+          <article class="card" aria-labelledby="s1c2">
+            <img src="https://picsum.photos/640/400?random=3" alt="Image exemple 2">
+            <div class="hr"></div>
+            <h3 id="s1c2">Titre d’élément</h3>
+            <p>Texte exemple — description courte et générique d’un bloc de contenu.</p>
+            <a class="btn ghost" href="#section-1">Bouton</a>
+          </article>
+          <article class="card" aria-labelledby="s1c3">
+            <img src="https://picsum.photos/640/400?random=4" alt="Image exemple 3">
+            <div class="hr"></div>
+            <h3 id="s1c3">Titre d’élément</h3>
+            <p>Texte exemple — description courte et générique d’un bloc de contenu.</p>
+            <a class="btn ghost" href="#section-1">Bouton</a>
+          </article>
+        </div>
+      </section>
+
+      <!-- Section 2 -->
+      <section id="section-2" aria-labelledby="h-s2">
+        <div class="kicker"><span class="k-dot" aria-hidden="true"></span><span>Section 2</span></div>
+        <h2 id="h-s2">Titre de section</h2>
+        <p class="lead">Sous-titre — zone en deux colonnes (texte + image).</p>
+        <div class="hero">
+          <div>
+            <h3>Sous-titre (bloc texte)</h3>
+            <p>Texte de présentation — contenu fictif. Utilisez ce bloc pour montrer des listes, des paragraphes, des boutons.</p>
+            <ul>
+              <li>Point 1 — Texte exemple</li>
+              <li>Point 2 — Texte exemple</li>
+              <li>Point 3 — Texte exemple</li>
+            </ul>
+            <a class="btn" href="#section-3">Bouton d’exemple</a>
+          </div>
+          <div>
+            <img src="https://picsum.photos/800/520?random=5" alt="Image exemple section 2">
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 3 -->
+      <section id="section-3" aria-labelledby="h-s3">
+        <div class="kicker"><span class="k-dot" aria-hidden="true"></span><span>Section 3</span></div>
+        <h2 id="h-s3">Titre de section</h2>
+        <p class="lead">Sous-titre — grille fluide de cartes (3 colonnes / responsive).</p>
+        <div class="card-grid" style="margin-top:16px;">
+          <article class="card" aria-labelledby="s3c1">
+            <h3 id="s3c1">Titre</h3>
+            <p>Texte exemple — paragraphe générique. Contenu remplaçable.</p>
+            <img src="https://picsum.photos/640/400?random=6" alt="Image exemple 4" style="margin-top:10px;">
+          </article>
+          <article class="card" aria-labelledby="s3c2">
+            <h3 id="s3c2">Titre</h3>
+            <p>Texte exemple — paragraphe générique. Contenu remplaçable.</p>
+            <img src="https://picsum.photos/640/400?random=7" alt="Image exemple 5" style="margin-top:10px;">
+          </article>
+          <article class="card" aria-labelledby="s3c3">
+            <h3 id="s3c3">Titre</h3>
+            <p>Texte exemple — paragraphe générique. Contenu remplaçable.</p>
+            <img src="https://picsum.photos/640/400?random=8" alt="Image exemple 6" style="margin-top:10px;">
+          </article>
+        </div>
+      </section>
+
+      <!-- Contact -->
+      <section id="contact" aria-labelledby="h-contact">
+        <div class="kicker"><span class="k-dot" aria-hidden="true"></span><span>Contact</span></div>
+        <h2 id="h-contact">Titre de section</h2>
+        <p class="lead">Sous-titre — formulaire de contact générique (non connecté).</p>
+
+        <form action="#" method="post" onsubmit="event.preventDefault()" aria-label="Formulaire d’exemple">
+          <div class="field">
+            <label for="nom">Titre : Nom</label>
+            <input id="nom" name="nom" type="text" placeholder="Votre nom (exemple)">
+          </div>
+          <div class="field">
+            <label for="email">Titre : Email</label>
+            <input id="email" name="email" type="email" placeholder="exemple@domaine.com">
+          </div>
+          <div class="field">
+            <label for="message">Titre : Message</label>
+            <textarea id="message" name="message" rows="5" placeholder="Votre message (exemple)"></textarea>
+          </div>
+          <button class="btn" type="submit">Bouton — Envoyer</button>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    // ===== Scrollspy (surbrillance du lien actif) =====
+    const links = Array.from(document.querySelectorAll('.nav-link'));
+    const sections = links.map(a => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+
+    const spy = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        const id = '#' + entry.target.id;
+        const link = links.find(a => a.getAttribute('href') === id);
+        if(entry.isIntersecting){
+          links.forEach(l => l.classList.toggle('active', l === link));
+        }
+      });
+    }, { rootMargin: '-40% 0px -55% 0px', threshold: 0.1 });
+
+    sections.forEach(s => spy.observe(s));
+
+    // ===== Révélation douce des sections =====
+    const rev = new IntersectionObserver((entries, obs) => {
+      entries.forEach(entry => {
+        if(entry.isIntersecting){
+          entry.target.classList.add('revealed');
+          obs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('section').forEach(sec => rev.observe(sec));
+  </script>
+</body>
+</html>
